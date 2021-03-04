@@ -6,7 +6,7 @@ def getRegions(def enviroment) {
 }
 
 
-def build_application() {
+def build_application(def enviroment) {
     sh 'make create.zip'
     sh 'upload.zip'
 }

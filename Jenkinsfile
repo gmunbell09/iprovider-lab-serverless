@@ -15,9 +15,8 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                //echo 'Building..'
                 script {
-                  fnSteps.build_application()
+                  fnSteps.build_application(params.ENVIRONMENT)
                 }
             }
         }
