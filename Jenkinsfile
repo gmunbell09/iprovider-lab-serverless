@@ -1,5 +1,5 @@
 pipeline {
-  agent any
+    agent any
   parameters {
     choice(
       name: 'ENVIRONMENT',
@@ -10,17 +10,21 @@ pipeline {
       choices: ['DEFAULT', 'DEPLOY_STACK', 'UPDATE_FUNCTION']
     )
   }
-  stages {
-    stage('Build') {
-      steps {
-          echo 'Building'
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building..'
+            }
         }
-      }
+        stage('Test') {
+            steps {
+                echo 'Testing..'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying....'
+            }
+        }
     }
-  }
-  post {
-    always {
-      cleanWs()
-    }
-  }
 }
