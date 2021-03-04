@@ -3,6 +3,13 @@ GID_LOCAL        ?= "$(shell id -g)"
 APP_DIR           = app
 IMAGE_BUILD       = microsoft/dotnet
 
+build:
+	docker container run --env DOTNET_CLI_HOME=/tmp/ \
+		--workdir "/${APP_DIR}" --rm -i \
+		-u ${UID_LOCAL}:${GID_LOCAL} \
+		-v "${PWD}/${APP_DIR}":/${APP_DIR} \
+		${IMAGE_BUILD} \
+		dotnet publish /${APP_DIR}/src/serverless-apirest/serverless-apirest.csproj -o /${APP_DIR}/release
 
 create.zip:
 	@cd ${PWD}/${APP_DIR}/release && zip -r9 $(PROJECT_NAME).zip *

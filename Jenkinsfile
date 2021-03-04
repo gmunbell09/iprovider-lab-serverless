@@ -17,7 +17,7 @@ pipeline {
             steps {
               echo params.ENVIRONMENT
                 script {
-                  sh 'make create.zip'
+                  sh 'make build'
                 }
             }
         }
