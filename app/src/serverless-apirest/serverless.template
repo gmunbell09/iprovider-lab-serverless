@@ -1,0 +1,146 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Transform": "AWS::Serverless-2016-10-31",
+  "Description": "An AWS Serverless Application that uses the ASP.NET Core framework running in Amazon Lambda.",
+
+  "Parameters": {
+    "ProjectName": {
+        "Description": "Name that defines the project",
+        "Type": "String"
+    }
+  },
+
+  "Conditions": {},
+
+  "Resources": {
+
+    "ApiGateway": {
+        "Type": "AWS::ApiGateway::RestApi",
+        "Properties": {
+            "Name": {"Ref": "ProjectName"}
+        }
+    },
+
+    "ApiGatewayResource": {
+        "Type": "AWS::ApiGateway::Resource",
+        "Properties": {
+            "ParentId" : {"Fn::GetAtt": ["ApiGateway","RootResourceId"]},
+            "RestApiId" : {"Ref": "ApiGateway"},
+            "PathPart" : "{proxy+}"
+        }
+    },
+
+
+   "RootMethod": {
+        "Type": "AWS::ApiGateway::Method",
+        "Properties": {
+            "HttpMethod" : "ANY",
+            "AuthorizationType" : "NONE",
+            "Integration" : {
+                "IntegrationHttpMethod" : "ANY",
+                "Type" : "AWS_PROXY",
+                "Uri" : { 
+                    "Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations" 
+                },
+                "IntegrationResponses" : {
+                    "StatusCode" : "200"
+                 }
+            },
+            "ResourceId" : {"Fn::GetAtt": ["ApiGateway","RootResourceId"]},
+            "RestApiId" : {"Ref": "ApiGateway"}
+        }
+   },
+
+   "ProxyMethod": {
+        "Type": "AWS::ApiGateway::Method",
+        "Properties": {
+            "HttpMethod" : "ANY",
+            "AuthorizationType" : "NONE",
+            "Integration" : {
+                "IntegrationHttpMethod" : "ANY",
+                "Type" : "AWS_PROXY",
+                "Uri" : { 
+                    "Fn::Sub" : "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations" 
+                },
+                "IntegrationResponses" : {
+                    "StatusCode" : "200"
+                }
+            },
+            "ResourceId" : {"Ref": "ApiGatewayResource"},
+            "RestApiId" : {"Ref": "ApiGateway"}
+        }
+   },
+
+    "Deployment": {
+        "DependsOn" : ["RootMethod","ProxyMethod"],
+        "Type" : "AWS::ApiGateway::Deployment",
+        "Properties" : {
+            "RestApiId" : {"Ref": "ApiGateway"},
+            "StageName" : "Stage"
+        }
+    },
+
+    "Stage": {
+        "Type" : "AWS::ApiGateway::Stage",
+        "Properties" : {
+            "DeploymentId" : {"Ref": "Deployment"},
+            "RestApiId" : {"Ref": "ApiGateway"},
+            "StageName" : "Prod"
+        }
+    },
+
+   "RootPermission": {
+        "Type" : "AWS::Lambda::Permission",
+        "Properties" : {
+            "Action" : "lambda:InvokeFunction",
+            "FunctionName" : {"Ref": "LambdaFunction"},
+            "Principal" : "apigateway.amazonaws.com",
+            "SourceArn" : {
+                "Fn::Sub" : [ "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/",
+                {
+                    "__Stage__": "*",
+                     "__ApiId__": {"Ref": "ApiGateway"}
+                }]}
+        }
+   },
+
+   "ProxyPermission": {
+        "Type" : "AWS::Lambda::Permission",
+        "Properties" : {
+            "Action" : "lambda:InvokeFunction",
+            "FunctionName" : {"Ref": "LambdaFunction"},
+            "Principal" : "apigateway.amazonaws.com",
+            "SourceArn" : {
+                "Fn::Sub" : [ "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/*",
+                {
+                    "__Stage__": "*",
+                     "__ApiId__": {"Ref": "ApiGateway"}
+                }]}
+        }
+   },
+
+    "LambdaFunction": {
+      "Type": "AWS::Serverless::Function",
+      "Properties": {
+        "FunctionName": {"Ref": "ProjectName"},
+        "Handler": "serverless-apirest::serverless_apirest.LambdaEntryPoint::FunctionHandlerAsync",
+        "Runtime": "dotnetcore3.1",
+        "CodeUri": "",
+        "MemorySize": 256,
+        "Timeout": 300,
+        "Role": null,
+        "Policies": [
+          "AWSLambda_FullAccess"
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "ApiURL": {
+      "Description": "API endpoint URL for Prod environment",
+      "Value": {
+        "Fn::Sub": "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+      }
+    }
+  }
+}
