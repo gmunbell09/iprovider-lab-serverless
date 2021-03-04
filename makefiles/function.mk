@@ -1,7 +1,7 @@
 UID_LOCAL        ?= "$(shell id -u)"
 GID_LOCAL        ?= "$(shell id -g)"
 APP_DIR           = app
-IMAGE_BUILD       = microsoft/dotnet
+IMAGE_BUILD       = mcr.microsoft.com/dotnet/core/sdk
 
 build:
 	docker container run --env DOTNET_CLI_HOME=/tmp/ \
