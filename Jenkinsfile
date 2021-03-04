@@ -17,7 +17,7 @@ pipeline {
             steps {
               echo params.ENVIRONMENT
                 script {
-                  fnSteps.build_application(params.ENVIRONMENT)
+                  sh 'make create.zip'
                 }
             }
         }
