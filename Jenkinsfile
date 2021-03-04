@@ -18,6 +18,8 @@ pipeline {
               echo params.ENVIRONMENT
                 script {
                   sh 'make build'
+                  sh 'make create.zip'
+                  sh 'make upload.zip'
                 }
             }
         }
