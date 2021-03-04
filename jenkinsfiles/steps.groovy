@@ -1,6 +1,12 @@
 def getRegions(def enviroment) {
     def REGIONS = [
-        dev: 'us-east-1'
+        lab: 'us-east-1'
     ]
     return REGIONS[enviroment]
+}
+
+
+def build_application() {
+    sh 'make create.zip'
+    sh 'upload.zip'
 }

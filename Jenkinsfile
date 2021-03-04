@@ -1,9 +1,11 @@
+def fnSteps = evaluate readTrusted("jenkinsfiles/steps.groovy")
+
 pipeline {
     agent any
   parameters {
     choice(
       name: 'ENVIRONMENT',
-      choices: ['dev', 'pre', 'prod']
+      choices: ['lab', 'dev']
     )
     choice(
       name: 'EXECUTE',
@@ -13,7 +15,10 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo 'Building..'
+                //echo 'Building..'
+                script {
+                  fnSteps.build_application()
+                }
             }
         }
         stage('Test') {
