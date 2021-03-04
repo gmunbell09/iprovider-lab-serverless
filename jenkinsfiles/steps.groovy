@@ -7,6 +7,11 @@ def getRegions(def enviroment) {
 
 
 def build_application(def enviroment) {
-    sh 'make create.zip'
-    sh 'upload.zip'
+    withEnv(enviroment) {
+        sh 'make create.zip'
+        sh 'upload.zip' 
+    }
+
 }
+
+return this

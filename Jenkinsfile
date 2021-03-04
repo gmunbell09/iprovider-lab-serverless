@@ -15,6 +15,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
+              echo params.ENVIRONMENT
                 script {
                   fnSteps.build_application(params.ENVIRONMENT)
                 }
