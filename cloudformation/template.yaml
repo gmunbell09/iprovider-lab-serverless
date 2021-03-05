@@ -46,7 +46,17 @@ Resources:
       StageName: iprovider
     DependsOn: 
       - ApiGatewayProxyMethod
-      
+
+  LambdaPermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !GetAtt LambdaFunction.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Join [ "", [ 'arn:aws:execute-api:', !Ref 'AWS::Region', ":", !Ref 'AWS::AccountId', ":", !Ref 'ApiGateway', "/*/*/*", ] ]
+    DependsOn: 
+      - LambdaFunction
+
   LamdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -58,14 +68,6 @@ Resources:
         Bucket: !Ref SourceFunctionBucket
         Key: !Ref SourceFunctionKey
       Policies: AWSLambda_FullAccess
-
-  LambdaPermission:
-    Type: 'AWS::Lambda::Permission'
-    Properties:
-      Action: 'lambda:InvokeFunction'
-      FunctionName: !GetAtt LambdaFunction.Arn
-      Principal: apigateway.amazonaws.com
-      SourceArn: !Join [ "", [ 'arn:aws:execute-api:', !Ref 'AWS::Region', ":", !Ref 'AWS::AccountId', ":", !Ref 'ApiGateway', "/*/*/*", ] ]
 
 Outputs:
   RootUrl:
