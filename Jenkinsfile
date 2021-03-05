@@ -15,7 +15,6 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-              echo params.ENVIRONMENT
                 script {
                   sh 'make build'
                   sh 'make create.zip'
@@ -29,8 +28,11 @@ pipeline {
             }
         }
         stage('Deploy') {
+            when { expression { return params.EXECUTE == 'DEPLOY_STACK' } }
             steps {
-                echo 'Deploying....'
+                escript {
+                  sh 'make stack.deploy'
+                }
             }
         }
     }

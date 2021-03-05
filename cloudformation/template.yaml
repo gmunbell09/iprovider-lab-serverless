@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: "descripcion del stack"
+
+Parameters:
+  ProjectName:
+    Description: ""
+    Type: String
+  SourceFunctionBucket:
+    Description: "Bucket where the lambda code is found"
+    Type: String
+  SourceFunctionKey:
+    Description: "Key where the lambda code is found"
+    Type: String
+
+Resources:
+  LamdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: serverless-apirest::serverless_apirest.LambdaEntryPoint::FunctionHandlerAsync
+      Runtime: dotnetcore3.1
+      MemorySize: 256
+      Timeout: 30
+      CodeUri:
+        Bucket: !Ref SourceFunctionBucket
+        Key: !Ref SourceFunctionKey
+      Policies: AWSLambda_FullAccess
+      Events:
+        Proxy:
+          Type: Api
+          Properties:
+            Path: "/{proxy+}"
+            Method: ANY
+        root:
+          Type: Api
+          Properties:
+            Path: "/"
+            Method: ANY
+        
+
+Outputs:
+  RootUrl:
+    Description: "Url principal del servicio iprovider"
+    Value: !Sub https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/
+
+
