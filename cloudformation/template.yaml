@@ -14,6 +14,39 @@ Parameters:
     Type: String
 
 Resources:
+  ApiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Ref ProjectName
+      FailOnWarnings: true
+
+  ApiGatewayResource:
+    Type: "AWS::ApiGateway::Resource"
+    Properties:
+      RestApiId: !Ref ApiGateway
+      ParentId: !GetAtt [ApiGateway, RootResourceId]
+      PathPart: "{proxy+}"
+
+  ApiGatewayProxyMethod:
+    Type: "AWS::ApiGateway::Method"
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: ANY
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: "AWS_PROXY"
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations
+      ResourceId: !Ref ApiGatewayResource
+      RestApiId: !Ref ApiGateway
+
+  ApiGatewayDeployment:
+    Type: "AWS::ApiGateway::Deployment"
+    Properties:
+      RestApiId: !Ref ApiGateway
+      StageName: iprovider
+    DependsOn: 
+      - ApiGatewayProxyMethod
+      
   LamdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -25,22 +58,18 @@ Resources:
         Bucket: !Ref SourceFunctionBucket
         Key: !Ref SourceFunctionKey
       Policies: AWSLambda_FullAccess
-      Events:
-        Proxy:
-          Type: Api
-          Properties:
-            Path: "/{proxy+}"
-            Method: ANY
-        root:
-          Type: Api
-          Properties:
-            Path: "/"
-            Method: ANY
-        
+
+  LambdaPermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !GetAtt LambdaFunction.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Join [ "", [ 'arn:aws:execute-api:', !Ref 'AWS::Region', ":", !Ref 'AWS::AccountId', ":", !Ref 'ApiGateway', "/*/*/*", ] ]
 
 Outputs:
   RootUrl:
     Description: "Url principal del servicio iprovider"
-    Value: !Sub https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/
+    Value: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/iprovider/
 
 
