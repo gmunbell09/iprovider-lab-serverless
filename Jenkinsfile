@@ -30,7 +30,7 @@ pipeline {
         stage('Deploy') {
             when { expression { return params.EXECUTE == 'DEPLOY_STACK' } }
             steps {
-                escript {
+                script {
                   sh 'make stack.deploy'
                 }
             }
