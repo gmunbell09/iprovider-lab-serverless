@@ -12,6 +12,9 @@ Parameters:
   SourceFunctionKey:
     Description: "Key where the lambda code is found"
     Type: String
+  CognitoUserGroup:
+    Description: "Cognito user Pool"
+    Type: String
 
 Resources:
   ApiGateway:
@@ -46,6 +49,16 @@ Resources:
       StageName: iprovider
     DependsOn: 
       - ApiGatewayProxyMethod
+
+  ApiGatewayAuthorizer:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: !Ref ProjectName
+      Type: COGNITO_USER_POOLS
+      IdentitySource: method.request.header.authorization
+      ProviderARNs:
+        - !Ref CognitoUserGroup
+      RestApiId: !Ref ApiGateway
 
   LambdaPermission:
     Type: 'AWS::Lambda::Permission'
