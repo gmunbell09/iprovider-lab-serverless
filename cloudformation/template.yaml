@@ -28,7 +28,7 @@ Resources:
     Properties:
       RestApiId: !Ref ApiGateway
       ParentId: !GetAtt [ApiGateway, RootResourceId]
-      PathPart: "lml"
+      PathPart: "{proxy+}"
 
   ApiGatewayProxyMethod:
     Type: "AWS::ApiGateway::Method"
@@ -37,7 +37,7 @@ Resources:
       HttpMethod: ANY
       Integration:
         IntegrationHttpMethod: POST
-        Type: "AWS"
+        Type: "AWS_PROXY"
         Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations
       ResourceId: !Ref ApiGatewayResource
       RestApiId: !Ref ApiGateway
@@ -55,7 +55,7 @@ Resources:
     Properties:
       Name: !Ref ProjectName
       Type: COGNITO_USER_POOLS
-      IdentitySource: method.request.header.authorization
+      IdentitySource: method.request.header.Authorization
       ProviderARNs:
         - !Ref CognitoUserGroup
       RestApiId: !Ref ApiGateway
