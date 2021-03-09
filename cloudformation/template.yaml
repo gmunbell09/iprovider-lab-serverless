@@ -28,7 +28,7 @@ Resources:
     Properties:
       RestApiId: !Ref ApiGateway
       ParentId: !GetAtt [ApiGateway, RootResourceId]
-      PathPart: "{proxy+}"
+      PathPart: "lml"
 
   ApiGatewayProxyMethod:
     Type: "AWS::ApiGateway::Method"
@@ -37,7 +37,7 @@ Resources:
       HttpMethod: ANY
       Integration:
         IntegrationHttpMethod: POST
-        Type: "AWS_PROXY"
+        Type: "AWS"
         Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations
       ResourceId: !Ref ApiGatewayResource
       RestApiId: !Ref ApiGateway
