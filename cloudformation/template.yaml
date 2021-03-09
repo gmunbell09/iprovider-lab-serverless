@@ -34,7 +34,7 @@ Resources:
     Type: "AWS::ApiGateway::Method"
     Properties:
       AuthorizationType: COGNITO_USER_POOLS
-      AuthorizerId: !Ref Authorizer
+      AuthorizerId: !Ref ApiGatewayAuthorizer
       HttpMethod: ANY
       Integration:
         IntegrationHttpMethod: POST
