@@ -5,7 +5,8 @@ PRODUCT       = iprovider
 FUNCTION      = lab
 
 ## PARAMS VARS
-DEPLOY_REGION    = us-east-2
+DEPLOY_REGION      = us-east-2
+COGNITO_USER_GROUP = arn:aws:cognito-idp:us-east-2:432499991508:userpool/us-east-2_Kf22M5zA0
 
 ## GENERAL VARS ##
 ENV                     = lab
