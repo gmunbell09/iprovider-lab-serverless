@@ -32,12 +32,22 @@ pipeline {
                 echo 'Testing..'
             }
         }
-        stage('Deploy') {
+        stage('Deploy Stack') {
             when { expression { return params.EXECUTE == 'DEPLOY_STACK' } }
             steps {
                 script {
-                  sh 'make stack.deploy'
+                  fnSteps.stack_deploy(config)
                 }
+            }
+        }
+        stage('Update Function') {
+            steps {
+                echo 'Update Function ...'
+            }
+        }
+        stage('Delete Stack') {
+            steps {
+                echo 'Delete Stack..'
             }
         }
     }

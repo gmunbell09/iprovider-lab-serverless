@@ -28,7 +28,12 @@ def build_application(def config) {
         sh 'make create.zip'
         sh 'make upload.zip'
     }
+}
 
+def stack_deploy(def config) {
+    withEnv(config) {
+        sh 'make stack.deploy'
+    }
 }
 
 return this
