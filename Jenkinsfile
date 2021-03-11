@@ -13,12 +13,17 @@ pipeline {
       )
     }
     stages {
+        stage('Setting') {
+            steps {
+                script {
+                  config = fnSteps.configs(params.ENVIRONMENT)
+                }
+            }
+        }
         stage('Build') {
             steps {
                 script {
-                  sh 'make build'
-                  sh 'make create.zip'
-                  sh 'make upload.zip'
+                  fnSteps.build_application(config)
                 }
             }
         }
