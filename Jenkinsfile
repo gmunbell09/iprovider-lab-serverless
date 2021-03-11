@@ -20,7 +20,7 @@ pipeline {
                 }
             }
         }
-        stage('Build') {
+        stage('Build Application') {
           when {
             expression {
               params.EXECUTE == 'DEPLOY_STACK' || params.EXECUTE == 'UPDATE_FUNCTION'
@@ -30,11 +30,6 @@ pipeline {
                 script {
                   fnSteps.build_application(config)
                 }
-            }
-        }
-        stage('Test') {
-            steps {
-                echo 'Testing..'
             }
         }
         stage('Deploy Stack') {
