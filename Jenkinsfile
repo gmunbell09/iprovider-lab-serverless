@@ -9,7 +9,7 @@ pipeline {
       )
       choice(
         name: 'EXECUTE',
-        choices: ['DEFAULT', 'DEPLOY_STACK', 'UPDATE_FUNCTION']
+        choices: ['DEFAULT', 'DEPLOY_STACK', 'UPDATE_FUNCTION', 'DELETE_STACK']
       )
     }
     stages {
@@ -41,11 +41,13 @@ pipeline {
             }
         }
         stage('Update Function') {
+            when { expression { return params.EXECUTE == 'UPDATE_FUNCTION' } }
             steps {
                 echo 'Update Function ...'
             }
         }
         stage('Delete Stack') {
+            when { expression { return params.EXECUTE == 'DELETE_STACK' } }
             steps {
                 echo 'Delete Stack..'
             }
